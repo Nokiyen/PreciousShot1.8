@@ -1,7 +1,5 @@
 package noki.preciousshot.mode;
 
-import static noki.preciousshot.PreciousShotData.PSOption.*;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -14,21 +12,37 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraft.util.IChatComponent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import noki.preciousshot.PreciousShotCore;
+import noki.preciousshot.helper.LangHelper;
 import noki.preciousshot.helper.ScreenShotHelper;
+import noki.preciousshot.helper.LangHelper.LangKey;
 import noki.preciousshot.resource.ResourceManager;
 import noki.preciousshot.resource.ResourceManager.ShotResource;
+import static noki.preciousshot.PreciousShotData.PSOption.*;
 
 
+/**********
+ * @class ModeEventPanorama
+ *
+ * @description パノラマモードをコントロールするクラスです。各種イベントにより疑似的なGUIになっています。
+ * @descriptoin_en 
+ */
 public class ModeEventPanorama extends ModeEventShooting {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	private int panoramaTimes;
 	private String currentFileName;
 	private ArrayList<int[]> pixels = new ArrayList<int[]>();
 	
 	
+	//******************************//
+	// define member methods.
+	//******************************//
 	@Override
 	@SubscribeEvent
 	public void onRenderTick(RenderTickEvent event) {
@@ -81,16 +95,24 @@ public class ModeEventPanorama extends ModeEventShooting {
 					this.pixels.clear();
 					
 					File file = null;
+					boolean res = false;
 					try {
 						File directory = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
 						directory.mkdir();
 						file = ScreenShotHelper.getTimestampedPNGFileForDirectory(directory);
 						PreciousShotCore.log("file name is %s.", file.getPath());
-						boolean res = ImageIO.write(bufferedimage, "png", file);
+						res = ImageIO.write(bufferedimage, "png", file);
 						PreciousShotCore.log("res is %s.", String.valueOf(res));
 					}
 					catch(Exception exception) {
 						PreciousShotCore.log("exception: %s", exception.toString());
+					}
+					
+					if(res == true) {
+						LangHelper.sendChatWithViewOpen(LangKey.PANORAMA_DONE, LangKey.SHOOTING_URL, file.getName());
+					}
+					else {
+						LangHelper.sendChat(LangKey.PANORAMA_FAILED);
 					}
 				}
 				break;
@@ -103,6 +125,9 @@ public class ModeEventPanorama extends ModeEventShooting {
 		
 		super.render();
 		
+		Minecraft mc = Minecraft.getMinecraft();
+		mc.fontRendererObj.drawString(LangKey.PANORAMA_MODE.translated(this.panoramaTimes+1), 5, 5, 0xffffff);
+
 		if(this.panoramaTimes == 0 || this.currentFileName == null) {
 			return;
 		}
@@ -111,8 +136,8 @@ public class ModeEventPanorama extends ModeEventShooting {
 		if(resource == null) {
 			return;
 		}
+		PreciousShotCore.log("panorama file name is %s.", this.currentFileName);
 		
-		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution resolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 		
 		double absTop = (TOP.getDouble()/(double)mc.displayHeight) * (double)resolution.getScaledHeight();
@@ -125,15 +150,45 @@ public class ModeEventPanorama extends ModeEventShooting {
 		
 	}
 	
+	protected void dealScreenshot() {
+		
+		if(SHOT.isEnable() == true) {
+			this.bookScreenShotOnNextTick();
+		}
+		else {
+			Minecraft mc = Minecraft.getMinecraft();
+			IChatComponent res = net.minecraft.util.ScreenShotHelper.saveScreenshot(
+					mc.mcDataDir, mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
+			mc.ingameGUI.getChatGUI().printChatMessage(res);
+		}
+		
+	}
+	
 	@Override
 	public String saveScreenshot(int top, int right, int bottom, int left) {
 		
 		this.currentFileName = super.saveScreenshot(top, right, bottom, left);
+		if(this.currentFileName == null) {
+			if(CHAT.isEnable()) {
+				LangHelper.sendChat(LangKey.SHOOTING_FAILED);
+			}
+			return null;
+		}
+		
 		this.panoramaTimes++;
 		int[] target = ScreenShotHelper.getPixels();
 		this.pixels.add(Arrays.copyOf(target, target.length));
 		ResourceManager.reloadResources();
+		
+		if(CHAT.isEnable()) {
+			LangHelper.sendChatWithViewOpen(LangKey.SHOOTING_DONE, LangKey.SHOOTING_URL, this.currentFileName);
+		}
 		return this.currentFileName;
+		
+	}
+	
+	@Override
+	public void setFadeStrings() {
 		
 	}
 	

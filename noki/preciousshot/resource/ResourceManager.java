@@ -14,13 +14,30 @@ import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 
+/**********
+ * @class ResourceManager
+ * @inner_class ShotResource, DateDescComparator
+ *
+ * @description screenshotsフォルダ内の画像についてコントロールするクラスです。
+ * @descriptoin_en 
+ */
 public class ResourceManager {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	public static File screenshotsDirectory;
 	public static IResourcePack screenshotsResourcePack;
 	public static ArrayList<ShotResource> resources;
 	
 	
+	//******************************//
+	// define member methods.
+	//******************************//
+	
+	//----------
+	//Static Method.
+	//----------
 	public static void init() {
 		
 		screenshotsDirectory = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
@@ -35,21 +52,28 @@ public class ResourceManager {
 		((SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager())
 			.reloadResourcePack(screenshotsResourcePack);
 		
-		resources.clear();
-		File[] files = screenshotsDirectory.listFiles();
-		Arrays.sort(files, new DateDescComparator());
-		for(File each: files) {
-			if(!isImage(each)) {
-				continue;
+		Thread thread = new Thread() {
+			@Override
+			synchronized public void run() {
+				resources.clear();
+				File[] files = screenshotsDirectory.listFiles();
+				Arrays.sort(files, new DateDescComparator());
+				for(File each: files) {
+					if(!isImage(each)) {
+						continue;
+					}
+					ResourceLocation location = new ResourceLocation("ps_screenshots", each.getName());
+					try {
+						InputStream stream = screenshotsResourcePack.getInputStream(location);
+						BufferedImage image = TextureUtil.readBufferedImage(stream);
+						resources.add(new ShotResource(each, location, image.getWidth(), image.getHeight()));
+					} catch (Exception e) {
+					}
+				}
 			}
-			ResourceLocation location = new ResourceLocation("ps_screenshots", each.getName());
-			try {
-				InputStream stream = screenshotsResourcePack.getInputStream(location);
-				BufferedImage image = TextureUtil.readBufferedImage(stream);
-				resources.add(new ShotResource(each, location, image.getWidth(), image.getHeight()));
-			} catch (Exception e) {
-			}
-		}
+		};
+		
+		thread.start();
 		
 	}
 	
@@ -79,6 +103,21 @@ public class ResourceManager {
 		
 	}
 	
+	public static int getResourceIndex(String fileName) {
+		
+		return resources.indexOf(getResource(fileName));
+		
+	}
+	
+	public static boolean exists(int index) {
+		
+		if(0<=index && index<=resources.size()-1) {
+			return resources.get(index) == null ? false : true;
+		}
+		return false;
+		
+	}
+	
 	public static boolean isImage(File file) {
 		
 		if(!file.isFile()) {
@@ -99,24 +138,29 @@ public class ResourceManager {
 		
 	}
 	
+	
+	//--------------------
+	// Inner Class.
+	//--------------------
 	public static class ShotResource {
-		
+		//*****define member variables.*//
 		public File file;
 		public ResourceLocation location;
 		public int width;
 		public int height;
 		
+		
+		//*****define member methods.***//
 		public ShotResource(File file, ResourceLocation location, int width, int height) {
 			this.file = file;
 			this.location = location;
 			this.width = width;
 			this.height = height;
 		}
-		
 	}
 	
 	public static class DateDescComparator implements Comparator<File> {
-		
+		//*****define member methods.***//
 		@Override
 		public final int compare(final File file1, final File file2) {
 			if((file1 != null) && (file2 != null)) {
@@ -124,7 +168,6 @@ public class ResourceManager {
 			}
 			return 0;
 		}
-		
 	}
 
 }

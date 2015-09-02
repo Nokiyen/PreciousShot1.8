@@ -3,6 +3,7 @@ package noki.preciousshot.asm;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AnalyzerAdapter;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 
 /**********
  * @class ASMClassTransformer
+ * @inner_class CustomClassVisitor1, CustomMethodVisitor1, CustomClassVisitor2, CustomMethodVisitor2
  *
  * @description 実際にASMによるバイトコード改変を行うクラスです。
  */
@@ -22,7 +24,7 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 	// define member variables.
 	//******************************//
 	private static final String TARGET_CLASS_NAME1 = "net.minecraft.client.Minecraft";
-//	private static final String TARGET_CLASS_NAME2 = "net.minecraft.client.renderer.EntityRenderer";
+	private static final String TARGET_CLASS_NAME2 = "net.minecraft.client.gui.GuiScreen";
 	
 	
 	//******************************//
@@ -33,12 +35,12 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 		
 		ASMLoadingPlugin.LOGGER.fine("enter ASMClassTransformer.");
 		
-/*		if (!transformedName.equals(TARGET_CLASS_NAME1) && !transformedName.equals(TARGET_CLASS_NAME2)) {
-			return basicClass;
-		}*/
-		if(!transformedName.equals(TARGET_CLASS_NAME1)) {
+		if (!transformedName.equals(TARGET_CLASS_NAME1) && !transformedName.equals(TARGET_CLASS_NAME2)) {
 			return basicClass;
 		}
+/*		if(!transformedName.equals(TARGET_CLASS_NAME1)) {
+			return basicClass;
+		}*/
 		try {
 			ASMLoadingPlugin.LOGGER.fine("enter transforming.");
 			
@@ -51,9 +53,9 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 			if(transformedName.equals(TARGET_CLASS_NAME1)) {
 				customVisitor = new CustomClassVisitor1(name, classWriter);
 			}
-/*			else if(transformedName.equals(TARGET_CLASS_NAME2)) {
+			else if(transformedName.equals(TARGET_CLASS_NAME2)) {
 				customVisitor = new CustomClassVisitor2(name, classWriter);
-			}*/
+			}
 			classReader.accept(customVisitor, ClassReader.EXPAND_FRAMES);
 			return classWriter.toByteArray();
 			
@@ -68,8 +70,7 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 	//--------------------
 	// Inner Class.
 	//--------------------
-	class CustomClassVisitor1 extends ClassVisitor {
-		
+	private class CustomClassVisitor1 extends ClassVisitor {
 		//*****define member variables.*//
 		private String owner;
 		
@@ -96,15 +97,13 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 			}
 			return super.visitMethod(access, name, desc, signature, exceptions);
 		}
-		
 	}
 	
 	//MethodVisitorの代わりにAnalyzerAdapterを使うことで、
 	//visitMax()やvisitFrame()の処理をしなくてよくなる。
 	//その代わり、各種superメソッドを呼び出す必要がある。
 	//COMPUTE_MAXでもそんなに速度落ちないという噂も。
-	class CustomMethodVisitor1 extends AnalyzerAdapter {
-		
+	private class CustomMethodVisitor1 extends AnalyzerAdapter {
 		//*****define member variables.*//
 		private boolean flag = false;
 		
@@ -112,7 +111,8 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 		private static final String DESC1 = "(Ljava/io/File;IILnet/minecraft/client/shader/Framebuffer;)Lnet/minecraft/util/IChatComponent;";
 		private static final String NAME2_OBF = "func_146227_a";
 		private static final String DESC2 = "(Lnet/minecraft/util/IChatComponent;)V";
-
+		
+		
 		//*****define member methods.***//
 		protected CustomMethodVisitor1(int api, String owner, int access, String name, String desc, MethodVisitor mv) {
 			super(api, owner, access, name, desc, mv);
@@ -142,21 +142,17 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 			}
 			super.visitMethodInsn(opcode, owner, name, desc, itf);
 	    }
-		
 	}
 	
-	
-	//焦点距離の変更が画角に影響しないためいったんコメントアウト。
-/*	class CustomClassVisitor2 extends ClassVisitor {
-		
+	private class CustomClassVisitor2 extends ClassVisitor {
+		//*****define member variables.*//
 		private String owner;
 		
-		private static final String TARGET_METHOD_NAME_OBF = "func_78479_a";
-		private static final String TARGET_METHOD_DESC = "(FI)V";
-		@SuppressWarnings("unused")
-		private static final String TARGET_METHOD_NAME = "setupCameraTransform";
+		private static final String TARGET_METHOD_NAME_OBF = "func_175276_a";
+		private static final String TARGET_METHOD_DESC = "(Lnet/minecraft/util/IChatComponent;)Z";
 		
 		
+		//*****define member methods.***//
 		public CustomClassVisitor2(String owner, ClassVisitor cv) {
 			super(Opcodes.ASM4, cv);
 			this.owner = owner;
@@ -173,32 +169,33 @@ public class ASMClassTransformer implements IClassTransformer, Opcodes {
 			}
 			return super.visitMethod(access, name, desc, signature, exceptions);
 		}
-		
 	}
 	
-	class CustomMethodVisitor2 extends AnalyzerAdapter {
-		
-		private static final String NAME1 = "gluPerspective";
-		private static final String DESC1 = "(FFFF)V";
-
+	private class CustomMethodVisitor2 extends AnalyzerAdapter {
+		//*****define member methods.***//
 		protected CustomMethodVisitor2(int api, String owner, int access, String name, String desc, MethodVisitor mv) {
 			super(api, owner, access, name, desc, mv);
 		}
 		
+		//chatクリック時のイベントを発生。
 		@Override
-		public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc, final boolean itf) {
-			if(opcode == INVOKESTATIC && NAME1.equals(name) && DESC1.equals(desc)) {
-				super.visitInsn(POP);
-				super.visitLdcInsn(RenderHelper.getZoomModifier());
-				super.visitInsn(FMUL);
-				super.visitVarInsn(ALOAD, 0);
-				super.visitFieldInsn(GETFIELD, "net/minecraft/client/renderer/EntityRenderer", "field_78530_s", "F");
-				super.visitFieldInsn(GETSTATIC, "net/minecraft/util/MathHelper", "field_180189_a", "F");
-				super.visitInsn(FMUL);
-			}
-			super.visitMethodInsn(opcode, owner, name, desc, itf);
-	    }
-		
-	}*/
-
+		public void visitCode() {
+			/*
+			 * if(ChatClickEvent.post(chatComponent) == true) {
+			 * 		return false;
+			 * }
+			 */
+			ASMLoadingPlugin.LOGGER.fine("enter visitCode().");
+			super.visitCode();
+			super.visitVarInsn(ALOAD, 1);
+			super.visitMethodInsn(INVOKESTATIC, "noki/preciousshot/asm/ChatClickEvent",
+					"postEvent", "(Lnet/minecraft/util/IChatComponent;)Z", false);
+			Label label = new Label();
+			super.visitJumpInsn(IFEQ, label);
+			super.visitLdcInsn(0);
+			super.visitInsn(IRETURN);
+			super.visitLabel(label);
+		}
+	}
+	
 }

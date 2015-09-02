@@ -14,8 +14,18 @@ import noki.preciousshot.helper.RenderHelper;
 import static noki.preciousshot.PreciousShotData.PSOption.*;
 
 
+/**********
+ * @class ModeGuiSetting
+ * @inner_class SettingButton, WithStrButton, GridSetButton, FrameSetButton
+ *
+ * @description 設定モードのGUIです。
+ * @descriptoin_en 
+ */
 public class ModeGuiSetting extends GuiScreen {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	private static final String domain = "preciousshot";
 	private static final ResourceLocation texture = new ResourceLocation(domain, "textures/gui/settings.png");
 	private static final int charX = 160;
@@ -31,6 +41,9 @@ public class ModeGuiSetting extends GuiScreen {
 	private boolean leftMoving = false;
 	
 	
+	//******************************//
+	// define member methods.
+	//******************************//
 	public ModeGuiSetting() {
 		
 	}
@@ -43,29 +56,29 @@ public class ModeGuiSetting extends GuiScreen {
 		int x = (this.width-menuWidth)/2;
 		int y = menuTop;
 		
-		this.buttonList.add(new SettingButton(0,	0+x,	8+y,	16,	8,	128,8,	GAMMA));
-		this.buttonList.add(new SettingButton(1,	0+x,	0+y,	16,	8,	128,0,	GAMMA));
-		this.buttonList.add(new WithStrButton(2,	16+x,	0+y,	38,	16,	16,	32,	GAMMA,	16, 2, "", ""));
-		this.buttonList.add(new SettingButton(3,	54+x,	8+y,	16,	8,	144,8,	GAMMA));
-		this.buttonList.add(new SettingButton(4,	54+x,	0+y,	16,	8,	144,0,	GAMMA));
+		this.buttonList.add(new SettingButton(0,	18+x,	8+y,	16,	8,	128,8,	GAMMA));
+		this.buttonList.add(new SettingButton(1,	18+x,	0+y,	16,	8,	128,0,	GAMMA));
+		this.buttonList.add(new WithStrButton(2,	34+x,	0+y,	38,	16,	16,	32,	GAMMA,	16, 2, "", ""));
+		this.buttonList.add(new SettingButton(3,	72+x,	8+y,	16,	8,	144,8,	GAMMA));
+		this.buttonList.add(new SettingButton(4,	72+x,	0+y,	16,	8,	144,0,	GAMMA));
 		
-		this.buttonList.add(new SettingButton(5,	72+x,	8+y,	16,	8,	128,8,	FOV));
-		this.buttonList.add(new SettingButton(6,	72+x,	0+y,	16,	8,	128,0,	FOV));
-		this.buttonList.add(new WithStrButton(7,	88+x,	0+y,	38,	16,	54,	32,	FOV,	16, 2, "", ""));
-		this.buttonList.add(new SettingButton(8,	126+x,	8+y,	16,	8,	144,8,	FOV));
-		this.buttonList.add(new SettingButton(9,	126+x,	0+y,	16,	8,	144,0,	FOV));
+		this.buttonList.add(new SettingButton(5,	90+x,	8+y,	16,	8,	128,8,	FOV));
+		this.buttonList.add(new SettingButton(6,	90+x,	0+y,	16,	8,	128,0,	FOV));
+		this.buttonList.add(new WithStrButton(7,	106+x,	0+y,	38,	16,	54,	32,	FOV,	16, 2, "", ""));
+		this.buttonList.add(new SettingButton(8,	144+x,	8+y,	16,	8,	144,8,	FOV));
+		this.buttonList.add(new SettingButton(9,	144+x,	0+y,	16,	8,	144,0,	FOV));
 		
-		this.buttonList.add(new SettingButton(10,	144+x,	8+y,	16,	8,	128,8,	CONT));
-		this.buttonList.add(new SettingButton(11,	144+x,	0+y,	16,	8,	128,0,	CONT));
-		this.buttonList.add(new WithStrButton(12,	160+x,	0+y,	38,	16,	92,	32,	CONT,	16, 2, "/", ""));
-		this.buttonList.add(new SettingButton(13,	198+x,	8+y,	16,	8,	144,8,	CONT));
-		this.buttonList.add(new SettingButton(14,	198+x,	0+y,	16,	8,	144,0,	CONT));
+		this.buttonList.add(new SettingButton(10,	162+x,	8+y,	16,	8,	128,8,	CONT));
+		this.buttonList.add(new SettingButton(11,	162+x,	0+y,	16,	8,	128,0,	CONT));
+		this.buttonList.add(new WithStrButton(12,	178+x,	0+y,	38,	16,	92,	32,	CONT,	16, 2, "/", ""));
+		this.buttonList.add(new SettingButton(13,	216+x,	8+y,	16,	8,	144,8,	CONT));
+		this.buttonList.add(new SettingButton(14,	216+x,	0+y,	16,	8,	144,0,	CONT));
 		
-		this.buttonList.add(new SettingButton(15,	216+x,	8+y,	16,	8,	128,8,	PANORAMA));
-		this.buttonList.add(new SettingButton(16,	216+x,	0+y,	16,	8,	128,0,	PANORAMA));
-		this.buttonList.add(new WithStrButton(17,	232+x,	0+y,	38,	16,	130,32,	PANORAMA, 16, 2, "x", ""));
-		this.buttonList.add(new SettingButton(18,	270+x,	8+y,	16,	8,	144,8,	PANORAMA));
-		this.buttonList.add(new SettingButton(19,	270+x,	0+y,	16,	8,	144,0,	PANORAMA));
+		this.buttonList.add(new SettingButton(15,	234+x,	8+y,	16,	8,	128,8,	PANORAMA));
+		this.buttonList.add(new SettingButton(16,	234+x,	0+y,	16,	8,	128,0,	PANORAMA));
+		this.buttonList.add(new WithStrButton(17,	250+x,	0+y,	38,	16,	130,32,	PANORAMA, 16, 2, "x", ""));
+		this.buttonList.add(new SettingButton(18,	288+x,	8+y,	16,	8,	144,8,	PANORAMA));
+		this.buttonList.add(new SettingButton(19,	288+x,	0+y,	16,	8,	144,0,	PANORAMA));
 		
 		this.buttonList.add(new GridSetButton(20,	0+x,	18+y,	16,	16,	0,	0,	GRID));
 		
@@ -74,18 +87,19 @@ public class ModeGuiSetting extends GuiScreen {
 		this.buttonList.add(new SettingButton(23,	54+x,	18+y,	16,	16,	48,	0,	MARGIN));
 		this.buttonList.add(new SettingButton(24,	72+x,	18+y,	16,	16,	48,	64,	CLICK));
 		this.buttonList.add(new SettingButton(25,	90+x,	18+y,	16,	16,	16,	64,	NIGHT));
+		this.buttonList.add(new SettingButton(26,	108+x,	18+y,	16,	16,	64,	64,	CHAT));
 		
-		this.buttonList.add(new SettingButton(26,	108+x,	18+y,	16,	16,	64,	0,	OTHER));
-		this.buttonList.add(new SettingButton(27,	126+x,	18+y,	16,	16,	80,	0,	OTHER));
-		this.buttonList.add(new SettingButton(28,	144+x,	18+y,	16,	16,	96,	0,	OTHER));
-		this.buttonList.add(new SettingButton(29,	162+x,	18+y,	16,	16,	112,0,	OTHER));
+		this.buttonList.add(new SettingButton(27,	126+x,	18+y,	16,	16,	64,	0,	OTHER));
+		this.buttonList.add(new SettingButton(28,	144+x,	18+y,	16,	16,	80,	0,	OTHER));
+		this.buttonList.add(new SettingButton(29,	162+x,	18+y,	16,	16,	96,	0,	OTHER));
+		this.buttonList.add(new SettingButton(30,	180+x,	18+y,	16,	16,	112,0,	OTHER));
 		
-		this.buttonList.add(new FrameSetButton(30,180+x,	18+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet1));
-		this.buttonList.add(new FrameSetButton(31,180+x,	27+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet2));
-		this.buttonList.add(new FrameSetButton(32,234+x,	18+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet3));
-		this.buttonList.add(new FrameSetButton(33,234+x,	27+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet4));
+		this.buttonList.add(new FrameSetButton(31,198+x,	18+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet1));
+		this.buttonList.add(new FrameSetButton(32,198+x,	27+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet2));
+		this.buttonList.add(new FrameSetButton(33,252+x,	18+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet3));
+		this.buttonList.add(new FrameSetButton(34,252+x,	27+y,	52,	7,	160,0,	OTHER,	0, 0, "", "", PreciousShotData.frameSet4));
 		
-		this.buttonList.add(new SettingButton(34,	288+x,	0+y,	16,	16,	32,	64,	OTHER));
+		this.buttonList.add(new SettingButton(35,	0+x,	0+y,	16,	16,	32,	64,	OTHER));
 		
 		RenderHelper.keepOriginalEffect();
 		RenderHelper.applySettingEffect();
@@ -111,24 +125,24 @@ public class ModeGuiSetting extends GuiScreen {
 			case 4: case 9: case 14: case 19:
 				if(target.option.isEnable()) target.option.add(10);
 				break;
-			case 2: case 7: case 12: case 17: case 21: case 22: case 23: case 24: case 25:
+			case 2: case 7: case 12: case 17: case 21: case 22: case 23: case 24: case 25: case 26:
 				target.option.switchEnable();
 				break;
-			case 26:
+			case 27:
 				int margin = LEFT.value() + RIGHT.value();
 				int newLeft = margin - margin/2;
 				int newRight = margin - newLeft;
 				LEFT.set(newLeft);
 				RIGHT.set(newRight);
 				break;
-			case 27:
+			case 28:
 				int margin2 = TOP.value() + BOTTOM.value();
 				int newTop = margin2 - margin2/2;
 				int newBottom = margin2 - newTop;
 				TOP.set(newTop);
 				BOTTOM.set(newBottom);
 				break;
-			case 28:
+			case 29:
 				int newWidth = Math.min(this.mc.displayHeight - TOP.value() - BOTTOM.value(), this.mc.displayWidth);
 				int newHeight = Math.min(this.mc.displayWidth - LEFT.value() - RIGHT.value(), this.mc.displayHeight);
 				int newLeft2 = (this.mc.displayWidth-newWidth) / 2;
@@ -140,13 +154,13 @@ public class ModeGuiSetting extends GuiScreen {
 				TOP.set(newTop2);
 				BOTTOM.set(newBottom2);
 				break;
-			case 29:
+			case 30:
 				LEFT.set(0);
 				RIGHT.set(0);
 				TOP.set(0);
 				BOTTOM.set(0);
 				break;
-			case 30: case 31: case 32: case 33:
+			case 31: case 32: case 33: case 34:
 				FrameSetButton setButton = (FrameSetButton)target;
 				int newLeft3 = (this.mc.displayWidth-setButton.frameSet.width) / 2;
 				int newRight3 =(this.mc.displayWidth-setButton.frameSet.width) - newLeft3;
@@ -157,7 +171,7 @@ public class ModeGuiSetting extends GuiScreen {
 				TOP.set(newTop3);
 				BOTTOM.set(newBottom3);
 				break;
-			case 34:
+			case 35:
 				this.mc.displayGuiScreen(new ModeGuiViewing());
 				break;
 			default:
@@ -199,14 +213,6 @@ public class ModeGuiSetting extends GuiScreen {
 		this.fontRendererObj.drawString(strH, centerX+1, centerY+10, 0xFFFFFF);
 		
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		
-	}
-	
-	@Override
-	public void onGuiClosed() {
-		
-		RenderHelper.recoverOriginalEffect();
-		RenderHelper.enableCrosshairs();
 		
 	}
 	
@@ -289,12 +295,26 @@ public class ModeGuiSetting extends GuiScreen {
 		
 	}
 	
-	private class SettingButton extends GuiButton {
+	@Override
+	public void onGuiClosed() {
 		
+		RenderHelper.recoverOriginalEffect();
+		RenderHelper.enableCrosshairs();
+		
+	}
+	
+	
+	//--------------------
+	// Inner Class.
+	//--------------------
+	private class SettingButton extends GuiButton {
+		//*****define member variables.*//
 		protected int textureX;
 		protected int textureY;
 		public PSOption option;
 		
+		
+		//*****define member methods.***//
 		public SettingButton(int buttonID, int x, int y, int width, int height, int textureX, int textureY, PSOption option) {
 			super(buttonID, x, y, width, height, "");
 			this.textureX = textureX;
@@ -321,16 +341,17 @@ public class ModeGuiSetting extends GuiScreen {
 			
 			GlStateManager.disableBlend();
 		}
-		
 	}
 	
 	private class WithStrButton extends SettingButton {
-		
+		//*****define member variables.*//
 		private int adjustLeft;
 		private int adjustRight;
 		private String prefix;
 		private String suffix;
 		
+		
+		//*****define member methods.***//
 		public WithStrButton(int buttonID, int x, int y, int width, int height, int textureX, int textureY,
 				PSOption option, int adjustLeft, int adjustRight, String prefix, String suffix) {
 			super(buttonID, x, y, width, height, textureX, textureY, option);
@@ -374,11 +395,10 @@ public class ModeGuiSetting extends GuiScreen {
 			
 			GlStateManager.disableBlend();
 		}
-		
 	}
 	
 	private class GridSetButton extends SettingButton {
-		
+		//*****define member methods.***//
 		public GridSetButton(int buttonID, int x, int y, int width, int height, int textureX, int textureY, PSOption option) {
 			super(buttonID, x, y, width, height, textureX, textureY, option);
 		}
@@ -394,13 +414,14 @@ public class ModeGuiSetting extends GuiScreen {
 			
 			GlStateManager.disableBlend();
 		}
-		
 	}
 	
 	private class FrameSetButton extends WithStrButton {
-		
+		//*****define member variables.*//
 		public FrameSet frameSet;
 		
+		
+		//*****define member methods.***//
 		public FrameSetButton(int buttonID, int x, int y, int width, int height, int textureX, int textureY, PSOption option,
 				int adjustLeft, int adjustRight, String prefix, String suffix, FrameSet frameSet) {
 			super(buttonID, x, y, width, height, textureX, textureY, option, adjustLeft, adjustRight, prefix, suffix);
@@ -412,7 +433,6 @@ public class ModeGuiSetting extends GuiScreen {
 			this.drawButtonBasic(mc, mouseX, mouseY);
 			this.drawStringFromTexture(this.frameSet.width+"x"+this.frameSet.height);
 		}
-		
 	}
 	
 }

@@ -1,6 +1,5 @@
 package noki.preciousshot;
 
-
 import java.io.File;
 
 import net.minecraft.client.Minecraft;
@@ -10,9 +9,11 @@ import net.minecraftforge.common.config.Property;
 
 
 /**********
- * @class SSSData
+ * @class PreciousShotData
+ * @inner_class PSOption, FrameSet
  *
  * @description このModの各種データを保存するクラスです。
+ * @descriptoin_en Class to store all of the data of this mod.
  */
 public class PreciousShotData {
 	
@@ -34,6 +35,10 @@ public class PreciousShotData {
 	//******************************//
 	// define member methods.
 	//******************************//
+	
+	//----------
+	//Static Method.
+	//----------
 	public static void setConf(File file) {
 		
 		configFile = file;
@@ -41,7 +46,7 @@ public class PreciousShotData {
 		config = new Configuration(configFile);
 		config.load();
 		
-		
+		//set configuration values.
 		keyNum = config.getInt("keyNum", "Settings", 38, 1, 300, "");
 		frameSet1 = new FrameSet(1, config, 640, 480);
 		frameSet2 = new FrameSet(2, config, 640, 360);
@@ -54,13 +59,17 @@ public class PreciousShotData {
 		twitterKeys[1] = config.getString("consumerSecret", "twitter", "", "");
 		twitterKeys[2] = config.getString("accessToken", "twitter", "", "");
 		twitterKeys[3] = config.getString("accessTokenSecret", "twitter", "", "");
+		//end.
 		
 		config.save();
 		
 	}
 	
+	//--------------------
+	// Inner Class.
+	//--------------------
 	public enum PSOption {
-		
+		//*****define enums.************//
 		TOP("top", true, false, 0, 0, Integer.MAX_VALUE){
 			@Override public void set(int value) {
 				this.property.set(MathHelper.clamp_int(value, this.minValue, Minecraft.getMinecraft().displayHeight));
@@ -85,27 +94,25 @@ public class PreciousShotData {
 				config.save();
 			}
 		},
-		
 		GAMMA("gamma", false, false, 0, 0, 200){
 			@Override public float getFloat() {
 				return (float)this.value() / 100.0F;
 			}
 		},
-		FOV("fov", false, false, 70, 10, 180),
+		FOV("fov", false, false, 70, 10, 170),
 		CONT("cont", false, false, 5, 1, 20),
-		ZOOM("zoom", false, false, 1, 1, 25),
 		PANORAMA("panorama", false, false, 6, 1, 20),
-		
 		GRID("grid", true, true, 0, 0, 5),
 		HIDE("hide", true, true, 1, 0, 1),
 		SHOT("shot", true, true, 1, 0, 1),
 		MARGIN("margin", true, true, 1, 0, 1),
 		CLICK("click", false, true, 0, 0, 1),
 		NIGHT("night", false, true, 0, 0, 1),
-		
+		CHAT("chat", true, true, 1, 0, 1),
 		OTHER("other", true, true, 1, 0, 1);
 		
 		
+		//*****define member variables.*//
 		protected static Configuration config;
 		
 		protected String name;
@@ -117,6 +124,8 @@ public class PreciousShotData {
 		protected Property property;
 		protected Property flagProperty;
 		
+		
+		//*****define member methods.***//
 		private PSOption(String name, boolean enable, boolean cycle, int defaultValue, int minValue, int maxValue) {
 			this.name = name;
 			this.enable = enable;
@@ -198,6 +207,8 @@ public class PreciousShotData {
 			}
 		}
 		
+		
+		//-----static methods.----------//
 		public static void setConfig(Configuration configuration) {			
 			config = configuration;
 			
@@ -206,11 +217,10 @@ public class PreciousShotData {
 				each.flagProperty = config.get("Saved Option", each.name+"Flag", each.enable);				
 			}			
 		}
-
 	}
 	
 	public static class FrameSet {
-		
+		//*****define member variables.*//
 		public int id;
 		public Configuration config;
 		
@@ -218,9 +228,11 @@ public class PreciousShotData {
 		public int defaultHeight;
 		public int width;
 		public int height;
-		public boolean forceDisplayWidth = false;
-		public boolean forceDisplayHeight = false;
+		public boolean forceDisplayWidth = false;	//currently not used.
+		public boolean forceDisplayHeight = false;	//currently not used.
 		
+		
+		//*****define member methods.***//
 		public FrameSet(int id, Configuration config, int defaultWidth, int defaultHeight) {
 			this.id = id;
 			this.config = config;
@@ -239,7 +251,6 @@ public class PreciousShotData {
 				forceDisplayHeight = true;
 			}
 		}
-		
 	}
 	
 }

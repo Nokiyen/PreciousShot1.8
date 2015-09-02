@@ -3,20 +3,35 @@ package noki.preciousshot.mode;
 import java.io.File;
 import java.io.IOException;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import noki.preciousshot.PreciousShotData;
+import noki.preciousshot.PreciousShotCore;
+import noki.preciousshot.helper.LangHelper;
 import noki.preciousshot.helper.RenderHelper;
 import noki.preciousshot.helper.TwitterHelper;
+import noki.preciousshot.helper.LangHelper.LangKey;
 import noki.preciousshot.resource.ResourceManager;
 import noki.preciousshot.resource.ResourceManager.ShotResource;
 
 
+/**********
+ * @class ModeGuiViewing
+ * @inner_class SettingButton, WithStrButton, GridSetButton, FrameSetButton
+ *
+ * @description 閲覧モードのGUIです。
+ * @descriptoin_en 
+ */
 public class ModeGuiViewing extends GuiScreen {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	private static final String domain = "preciousshot";
 	private static final ResourceLocation texture = new ResourceLocation(domain, "textures/gui/settings.png");
 	
@@ -41,11 +56,19 @@ public class ModeGuiViewing extends GuiScreen {
 	private ViewingButton eachPrevButton;
 	private ViewingButton eachNextButton;
 	
+	private GuiTextField twitterText;
+	private ViewingButton twitterSendButton;
+	private ViewingButton twitterCancelButton;
+	
 	private int pageNum;
 	private Phase currentPhase;
-	private int currentIndex;	
+	private int currentIndex;
+	private boolean twitter = false;
 	
 	
+	//******************************//
+	// define member methods.
+	//******************************//
 	public ModeGuiViewing() {
 		
 	}
@@ -69,10 +92,24 @@ public class ModeGuiViewing extends GuiScreen {
 		this.eachPrevButton	= new ViewingButton(6,	124+x,	0+y, 16, 16, 32, 96);
 		this.eachNextButton	= new ViewingButton(7,	142+x,	0+y, 16, 16, 48, 96);
 		
+		this.twitterText = new GuiTextField(8, this.mc.fontRendererObj, this.width/2-100, this.height/2, 200, 20);
+		this.twitterSendButton = new ViewingButton(9, this.width/2 - 18, this.height/2 + 24, 16, 16, 80, 96);
+		this.twitterCancelButton = new ViewingButton(10, this.width/2, this.height/2 + 24, 16, 16, 96, 96);
+		
 		this.tweetButton.disable();
 		this.returnButton.disable();
 		this.eachPrevButton.disable();
 		this.eachNextButton.disable();
+		
+		this.twitterSendButton.disable();
+		this.twitterCancelButton.disable();
+		
+		Keyboard.enableRepeatEvents(true);
+		this.twitterText.setVisible(false);
+		this.twitterText.setEnabled(false);
+		this.twitterText.setFocused(false);
+		this.twitterText.setMaxStringLength(80);
+		this.twitterText.setTextColor(0xffffff);
 		
 		this.buttonList.add(this.openButton);
 		this.buttonList.add(this.prevButton);
@@ -82,6 +119,8 @@ public class ModeGuiViewing extends GuiScreen {
 		this.buttonList.add(this.returnButton);
 		this.buttonList.add(this.eachPrevButton);
 		this.buttonList.add(this.eachNextButton);
+		this.buttonList.add(this.twitterSendButton);
+		this.buttonList.add(this.twitterCancelButton);
 		
 		this.pageNum = 0;
 		this.currentPhase = Phase.LIST;
@@ -131,12 +170,17 @@ public class ModeGuiViewing extends GuiScreen {
 				this.mc.displayGuiScreen(new ModeGuiSetting());
 				break;
 			case 4:
-				//tweet.
+				PreciousShotCore.log("enter button 4.");
 				if(TwitterHelper.isEnable()) {
-					ShotResource resource = ResourceManager.getResource(currentIndex);
-					if(resource != null) {
-						TwitterHelper.tweetMedia(resource.file);
-					}
+					PreciousShotCore.log("enter twitter.");
+					this.twitter = true;
+					this.twitterText.setVisible(true);
+					this.twitterText.setEnabled(true);
+					this.twitterSendButton.enable();
+					this.twitterCancelButton.enable();
+				}
+				else {
+					LangHelper.sendChat(LangKey.TWITTER_DISABLED);
 				}
 				break;
 			case 5:
@@ -146,6 +190,11 @@ public class ModeGuiViewing extends GuiScreen {
 				this.returnButton.disable();
 				this.eachPrevButton.disable();
 				this.eachNextButton.disable();
+				this.twitter = false;
+				this.twitterText.setVisible(false);
+				this.twitterText.setEnabled(false);
+				this.twitterSendButton.disable();
+				this.twitterCancelButton.disable();
 				break;
 			case 6:
 				if(ResourceManager.getSize() == 0) {
@@ -166,6 +215,28 @@ public class ModeGuiViewing extends GuiScreen {
 					this.currentIndex = (this.currentIndex+1) % ResourceManager.getSize();
 				}
 				break;
+			case 9:
+				if(TwitterHelper.isEnable()) {
+					ShotResource resource = ResourceManager.getResource(currentIndex);
+					if(resource != null) {
+						TwitterHelper.tweetMedia(this.twitterText.getText(), resource.file);
+						this.twitter = false;
+						this.twitterText.setVisible(false);
+						this.twitterText.setEnabled(false);
+						this.twitterSendButton.disable();
+						this.twitterCancelButton.disable();
+					}
+				}
+				else {
+					LangHelper.sendChat(LangKey.TWITTER_DISABLED);
+				}
+				break;
+			case 10:
+				this.twitter = false;
+				this.twitterText.setVisible(false);
+				this.twitterText.setEnabled(false);
+				this.twitterSendButton.disable();
+				this.twitterCancelButton.disable();
 			default:
 				break;
 		}
@@ -226,6 +297,9 @@ public class ModeGuiViewing extends GuiScreen {
 				break;
 			case EACH:
 				ShotResource resource = ResourceManager.getResource(currentIndex);
+				if(resource == null) {
+					break;
+				}
 				double scale = (double)this.width / (double)this.mc.displayWidth;
 				double scaledWidth = scale * (double)resource.width;
 				double scaledHeight = scale * (double)resource.height;
@@ -257,15 +331,7 @@ public class ModeGuiViewing extends GuiScreen {
 		}
 		
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		
-	}
-	
-	@Override
-	public void onGuiClosed() {
-		
-		RenderHelper.enableCrosshairs();
-		RenderHelper.enableHotbar();
-//		RenderHelper.recoverOriginal();
+		this.twitterText.drawTextBox();
 		
 	}
 	
@@ -273,6 +339,9 @@ public class ModeGuiViewing extends GuiScreen {
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		
 		super.mouseClicked(mouseX, mouseY, mouseButton);
+		if(this.twitter == true) {
+			this.twitterText.mouseClicked(mouseX, mouseY, mouseButton);
+		}
 		
 		if(currentPhase == Phase.LIST) {
 			int hNum = this.getColNum();
@@ -290,6 +359,9 @@ public class ModeGuiViewing extends GuiScreen {
 			}
 			
 			this.currentIndex = Math.min(posX, hNum) + Math.min(posY, vNum) * this.getColNum() + this.pageNum*hNum*vNum;
+			if(ResourceManager.exists(this.currentIndex) == false) {
+				return;
+			}
 			this.currentPhase = Phase.EACH;
 			this.tweetButton.enable();
 			this.returnButton.enable();
@@ -302,13 +374,10 @@ public class ModeGuiViewing extends GuiScreen {
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		
-		if(keyCode == 1 || keyCode == PreciousShotData.keyNum) {
-			this.mc.displayGuiScreen((GuiScreen)null);
-			if(this.mc.currentScreen == null) {
-				this.mc.setIngameFocus();
-			}
+		if(this.twitter == true && this.twitterText.textboxKeyTyped(typedChar, keyCode)) {
 			return;
 		}
+		super.keyTyped(typedChar, keyCode);
 		
 	}
 	
@@ -319,7 +388,16 @@ public class ModeGuiViewing extends GuiScreen {
 		
 	}
 	
-	public void drawStringFromTexture(String string, int x, int y) {
+	@Override
+	public void onGuiClosed() {
+		
+		RenderHelper.enableCrosshairs();
+		RenderHelper.enableHotbar();
+//		RenderHelper.recoverOriginal();
+		
+	}
+	
+	private void drawStringFromTexture(String string, int x, int y) {
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		
@@ -337,7 +415,7 @@ public class ModeGuiViewing extends GuiScreen {
 		GlStateManager.disableBlend();
 	}
 	
-	public int getMaxPage() {
+	private int getMaxPage() {
 		
 		int numPerPage = this.getColNum() * this.getRowNum();
 		int ceil = 1;
@@ -349,23 +427,40 @@ public class ModeGuiViewing extends GuiScreen {
 		
 	}
 	
-	public int getColNum() {
+	private int getColNum() {
 		
 		return this.width/boxWidth;
 		
 	}
 	
-	public int getRowNum() {
+	private int getRowNum() {
 		
 		return (this.height-boxHeight)/boxHeight;
 		
 	}
 	
-	private class ViewingButton extends GuiButton {
+	public void setEachView(int index) {
 		
+		this.currentPhase = Phase.EACH;
+		this.currentIndex = index;
+		this.tweetButton.enable();
+		this.returnButton.enable();
+		this.eachPrevButton.enable();
+		this.eachNextButton.enable();
+		
+	}
+	
+	
+	//--------------------
+	// Inner Class.
+	//--------------------
+	private class ViewingButton extends GuiButton {
+		//*****define member variables.*//
 		protected int textureX;
 		protected int textureY;
 		
+		
+		//*****define member methods.***//
 		public ViewingButton(int buttonID, int x, int y, int width, int height, int textureX, int textureY) {
 			super(buttonID, x, y, width, height, "");
 			this.textureX = textureX;
@@ -394,7 +489,6 @@ public class ModeGuiViewing extends GuiScreen {
 			this.enabled = false;
 			this.visible = false;
 		}
-		
 	}
 	
 	private enum Phase {

@@ -28,8 +28,12 @@ import java.util.UUID;
 /**********
  * @class VersionInfo
  *
- * @description 
- * @description_en
+ * @description 最新バージョンの存在を確認するためのクラスです。
+ * インスタンス化だけで機能します。
+ * そのままイベントに登録すれば、ワールドイン時に通知します。
+ * @description_en Class for checking up-to-date version of this mod.
+ * Just instance this, then all of check will be done.
+ * By registering the instance, it automatically notifies at the player's join. 
  */
 public class VersionInfo {
 	

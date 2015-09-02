@@ -15,11 +15,25 @@ import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.util.ResourceLocation;
 
 
+/**********
+ * @class ScreenShotsResourcePack
+ *
+ * @description screenshotsフォルダを、リソースパックとして扱うためのクラスです。
+ * これにより、screenshotsフォルダ内の画像に対してResourceLocationを使うことができます。
+ * @descriptoin_en 
+ */
 public class ScreenShotsResourcePack implements IResourcePack {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	private static final Set<String> resourceDomains = ImmutableSet.of("ps_screenshots");
 	private File screenshotsDirectory;
 	
+	
+	//******************************//
+	// define member methods.
+	//******************************//
 	public ScreenShotsResourcePack(File directory) {
 		
 		this.screenshotsDirectory = directory;

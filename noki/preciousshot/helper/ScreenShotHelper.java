@@ -21,13 +21,29 @@ import net.minecraft.client.shader.Framebuffer;
 import noki.preciousshot.PreciousShotCore;
 
 
+/**********
+ * @class ScreenShotHelper
+ *
+ * @description スクリーンショットを保存するためのクラスです。
+ * @descriptoin_en 
+ */
 public class ScreenShotHelper {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	private static IntBuffer pixelBuffer;
 	private static int[] pixelValues;
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 	
 	
+	//******************************//
+	// define member methods.
+	//******************************//
+	
+	//----------
+	//Static Method.
+	//----------
 	public static String saveScreenshot(int top, int right, int bottom, int left) {
 		
 		PreciousShotCore.log("enter screenshot.");
@@ -129,51 +145,5 @@ public class ScreenShotHelper {
 		return pixelValues;
 		
 	}
-	
-/*	public static void saveScreenshot2(int top, int right, int bottom, int left) {
-
-		try {
-			Robot robot = new Robot();
-			Rectangle rectangle =
-					new Rectangle(Display.getX()+left, Display.getY()+top, Display.getWidth()-right, Display.getHeight()-bottom);
-			BufferedImage bufferedimage = robot.createScreenCapture(rectangle);
-			
-			File directory = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
-			directory.mkdir();
-			File file = getTimestampedPNGFileForDirectory(directory);
-			PreciousShotCore.log("file name is %s.", file.getPath());
-			boolean res = ImageIO.write(bufferedimage, "png", file);
-			PreciousShotCore.log("res is %s.", String.valueOf(res));
-		}
-		catch(Exception exception) {
-			PreciousShotCore.log("exception: %s", exception.toString());
-		}
-		
-	}*/
-	
-/*	private static class ScreenShotThread extends Thread {
-		
-		private BufferedImage bufferedImage;
-		
-		public ScreenShotThread(BufferedImage bufferedImage) {
-			this.bufferedImage = bufferedImage;
-		}
-		
-		@Override
-		synchronized public void run() {
-			try {
-				File directory = new File(Minecraft.getMinecraft().mcDataDir, "screenshots");
-				directory.mkdir();
-				File file = getTimestampedPNGFileForDirectory(directory);
-				SSSCore.log("file name is %s.", file.getPath());
-				boolean res = ImageIO.write(this.bufferedImage, "png", file);
-				SSSCore.log("res is %s.", String.valueOf(res));
-			}
-			catch(Exception exception) {
-				SSSCore.log("exception: %s", exception.toString());
-			}
-		}
-		
-	}*/
 
 }

@@ -1,9 +1,9 @@
 package noki.preciousshot.helper;
 
-
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -12,11 +12,29 @@ import noki.preciousshot.PreciousShotData.PSOption;
 import static noki.preciousshot.PreciousShotData.PSOption.*;
 
 
+/**********
+ * @class RenderHelper
+ * @inner_class FadeStringRender
+ *
+ * @description 各種描画処理のためのヘルパークラスです。
+ * @descriptoin_en 
+ */
 public class RenderHelper {
 	
+	//******************************//
+	// define member variables.
+	//******************************//
 	public static float originalGamma;
 	public static float originalFov;
 	
+	
+	//******************************//
+	// define member methods.
+	//******************************//
+	
+	//----------
+	//Static Method.
+	//----------
 	public static void renderMargin(int top, int right, int bottom, int left, int dispWidth, int dispHeight) {
 		
 		Minecraft mc = Minecraft.getMinecraft();
@@ -222,6 +240,107 @@ public class RenderHelper {
 		
 		GuiIngameForge.renderHotbar = false;
 		
+	}
+	
+	
+	//--------------------
+	// Inner Class.
+	//--------------------
+	public static class FadeStringRender {
+		//*****define member variables.*//
+		public String text;
+		public int textColor;
+		public int xPosition;
+		public int yPosition;
+		public FontRenderer fontRenderer;
+		
+		public int readyTime;
+		public int fadeInTime;
+		public int displayTime;
+		public int fadeOutTime;
+		
+		public FadePhase currentPhase;
+		public int currentTime;
+		
+		
+		//*****define member methods.***//
+		public FadeStringRender(String text, int textColor, int xPosition, int yPosition, FontRenderer fontRenderer,
+				int readyTime, int fadeInTime, int displayTime, int fadeOutTime) {
+			this.text = text;
+			this.textColor = textColor;
+			this.xPosition = xPosition;
+			this.yPosition = yPosition;
+			this.fontRenderer = fontRenderer;
+			this.readyTime = readyTime;
+			this.fadeInTime = fadeInTime;
+			this.displayTime = displayTime;
+			this.fadeOutTime = fadeOutTime;
+			this.currentPhase = FadePhase.Ready;
+			this.currentTime = 0;
+		}
+		
+		public void tick(){
+			int caliculated = this.currentTime-this.readyTime;
+			if(caliculated== 0) {
+				this.currentPhase = FadePhase.FadeIn;
+			}
+			caliculated -= this.fadeInTime;
+			if(caliculated== 0) {
+				this.currentPhase = FadePhase.Display;
+			}
+			caliculated -= this.displayTime;
+			if(caliculated== 0) {
+				this.currentPhase = FadePhase.FadeOut;
+			}
+			caliculated -= this.fadeOutTime;
+			if(caliculated== 0) {
+				this.currentPhase = FadePhase.Finished;
+			}
+			
+			float density = 0.0F;
+			switch(this.currentPhase) {
+				case FadeIn:
+					density = (float)(this.currentTime-this.readyTime) / (float)this.fadeInTime;
+					break;
+				case Display:
+					density = 1.0F;
+					break;
+				case FadeOut:
+					density = 1.0F - 
+						(float)(this.currentTime-this.readyTime-this.fadeInTime-this.displayTime) / (float)this.fadeOutTime;
+					break;
+				default:
+					break;
+			}
+			if(density != 0) {
+		        GlStateManager.enableBlend();
+		        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+
+				int color = ((int)(0xFF*density) * 0x01000000)+ this.textColor;
+				this.fontRenderer.drawString(this.text, this.xPosition, this.yPosition, color);
+				
+		        GlStateManager.disableBlend();
+			}
+			
+			this.currentTime++;
+		}
+		
+		public boolean isFinished() {
+			return this.currentPhase == FadePhase.Finished ? true : false;
+		}
+		
+		public void resetPhase() {
+			this.currentPhase = FadePhase.Ready;
+			this.currentTime = 0;
+		}
+		
+		public enum FadePhase {
+			Ready,
+			FadeIn,
+			Display,
+			FadeOut,
+			Finished;
+		}
 	}
 	
 }
